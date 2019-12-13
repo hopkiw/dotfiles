@@ -1,0 +1,10 @@
+set show-mode-in-prompt on
+set completion-ignore-case on
+set blink-matching-paren on
+set show-all-if-ambiguous on
+
+set vi-ins-mode-string "+"
+set vi-cmd-mode-string ":"
+set editing-mode vi
+set keymap vi
+set match-hidden-files off
