@@ -1,6 +1,23 @@
-"enable plugins
-call pathogen#infect()
-call pathogen#helptags()
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+
+"enable bundled plugins
+call vundle#begin()
+
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'fatih/vim-go'
+Plugin 'tpope/vim-fugitive'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+
+call vundle#end()
+
+filetype plugin indent on
+syntax enable
 
 "colors
 let g:molokai_original = 1
@@ -31,9 +48,6 @@ set showmatch           "show matching brackets
 set matchtime=10        "for ten decisecs (1second)
 set showcmd
 set ignorecase
-
-filetype plugin indent on
-syntax on
 
 " Hexmode map
 command -bar Hexmode call hexmode#ToggleHex()
