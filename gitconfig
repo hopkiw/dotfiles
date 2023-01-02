@@ -1,0 +1,19 @@
+[url "git@github.com:"]
+  pushInsteadOf = https://github.com/
+  pushInsteadOf = http://github.com/
+  pushInsteadOf = git://github.com/
+[alias]
+  graph = log --all --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%ci) %C(bold blue)<%an>%Creset'
+  lg = log --graph
+[diff]
+  tool = vimdiff
+[merge]
+  tool = vimdiff
+[difftool]
+  prompt = false
+[branch]
+  autoSetupMerge = false
+[pull]
+  rebase = false
+[push]
+  negotiate = false
