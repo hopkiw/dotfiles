@@ -8,6 +8,7 @@ import requests
 
 WEBHOOK_URL = ('https://discordapp.com/api/webhooks/999543213578780727/GQMuhiR'
                '14KbBfVizrzis1n8pfUoeM02IawzR4_jh3kBtyPYf7yF78Q6CrYlDR5zID_Fz')
+CONFIG_DIR = os.path.join(os.environ.get('HOME', '.'), '.config', 'the_watcher')
 
 
 def encode_path(name):
@@ -29,7 +30,7 @@ def get_known_files(dirname):
 
   dirname = encode_path(dirname)
   try:
-    with open(f'/home/cc/.config/the_watcher/{dirname}.txt') as fh:
+    with open(os.path.join(CONFIG_DIR, f'{dirname}.txt')) as fh:
       ret = json.load(fh)
   except FileNotFoundError:
     ret = {}
@@ -41,7 +42,8 @@ def write_known_files(dirname, data):
   """Write state file."""
 
   dirname = encode_path(dirname)
-  with open(f'/home/cc/.config/the_watcher/{dirname}.txt', 'w+') as fh:
+  os.makedirs(CONFIG_DIR, exist_ok=True)
+  with open(os.path.join(CONFIG_DIR, f'{dirname}.txt'), 'w+') as fh:
     json.dump(data, fh)
 
 
@@ -73,7 +75,8 @@ def get_open_files(dirname):
 def notify(file):
   ret = requests.post(WEBHOOK_URL, json={'username': 'torrentz',
                                          'content': f'uploaded {file}'})
-  print('got ret:', ret)
+
+  return ret
 
 
 def main():
