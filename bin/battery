@@ -1,0 +1,10 @@
+#!/bin/bash
+
+bstatus="$(</sys/class/power_supply/BAT0/status)"
+bcapacity="$(</sys/class/power_supply/BAT0/capacity)"
+song="/usr/share/sounds/ubuntu/stereo/phone-outgoing-calling.ogg"
+
+if [[ $bstatus != "Charging" ]] && [[ $bcapacity -lt 15 ]]; then
+  notify-send -u critical " Battery low: ${bcapacity}%. Plug in the adapter!"
+  ogg123 $song $song $song
+fi
