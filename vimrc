@@ -19,6 +19,8 @@ Plugin 'tpope/vim-rhubarb'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'vim-syntastic/syntastic'
+Plugin 'davidhalter/jedi-vim'
+Plugin 'preservim/tagbar'
 
 call vundle#end()
 
@@ -139,3 +141,5 @@ let g:ctrlp_cmd = 'CtrlPBuffer'
 let g:ycm_show_diagnostics_ui=1
 
 hi Visual ctermfg=Yellow ctermbg=NONE cterm=bold,underline
+
+let g:ycm_always_populate_location_list = 1
