@@ -14,3 +14,5 @@ alias images='gcloud compute images list'
 alias gssh='gcloud compute ssh'
 alias list="gcloud compute instances list --format=\"table(name,metadata.items.extract(\"enable-oslogin\").flatten():label=OSLOGIN,machineType.basename())\" --filter=\"name !~ ^gke\""
 alias kairflow='kubectl exec -n $AIRFLOW_NS $AIRFLOW_POD -c airflow-scheduler -- airflow'
+
+alias tagger="feh -G --action ';[add tags]/home/cc/bin/feh_add_tag.sh %F' --info '/home/cc/bin/tagdb.py --get --path %F' --image-bg black --geometry '1720x1000+200+200' --scale-down"
