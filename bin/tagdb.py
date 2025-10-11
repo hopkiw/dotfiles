@@ -39,9 +39,16 @@ class TagDB:
 
     def add_image_tag(self, image_id, tag_id):
         cur = self.con.cursor()
-        cur.execute("""
-            INSERT OR IGNORE INTO imagetags (image_id, tag_id)
-            VALUES (?, ?)""", (image_id, tag_id))
+        cur.execute('INSERT OR IGNORE INTO imagetags (image_id, tag_id) VALUES (?, ?)', (image_id, tag_id))
+        self.con.commit()
+
+    def add_image_tag_list(self, image_list, tag_id):
+        cur = self.con.cursor()
+        cur.executemany("""
+            INSERT OR IGNORE INTO imagetags (image_id, tag_id) SELECT id, ?
+            FROM images
+            WHERE image_path = ? AND image_hash = ?""",
+                        [(tag_id, image_path, image_hash) for image_path, image_hash in image_list])
         self.con.commit()
 
     def add_tag(self, tag):
@@ -51,30 +58,34 @@ class TagDB:
 
     def add_image(self, image_path, image_hash):
         cur = self.con.cursor()
-        cur.execute("""
-            INSERT OR IGNORE INTO images (image_path, image_hash)
-            VALUES (?, ?)""", (image_path, image_hash))
+        cur.execute( 'INSERT OR IGNORE INTO images (image_path, image_hash) VALUES (?, ?)',
+                    (image_path, image_hash))
+        self.con.commit()
+
+    def add_image_list(self, image_list):
+        cur = self.con.cursor()
+        cur.executemany('INSERT OR IGNORE INTO images (image_path, image_hash) VALUES (?, ?)', image_list)
         self.con.commit()
 
     def get_tag(self, tag):
         cur = self.con.cursor()
-        res = cur.execute('SELECT id FROM tags WHERE tag = ?',
-                          (tag,))
+        res = cur.execute('SELECT id FROM tags WHERE tag = ?', (tag,))
         maybe = res.fetchone()
+
         return maybe[0] if maybe else None
 
     def get_image_by_path(self, image_path):
         cur = self.con.cursor()
-        res = cur.execute('SELECT id FROM images WHERE image_path = ?',
-                          (image_path,))
+        res = cur.execute('SELECT id FROM images WHERE image_path = ?', (image_path,))
         maybe = res.fetchone()
+
         return maybe[0] if maybe else None
 
     def get_image_by_hash(self, image_hash):
         cur = self.con.cursor()
-        res = cur.execute('SELECT id FROM images WHERE image_hash = ?',
-                          (image_hash,))
+        res = cur.execute('SELECT id FROM images WHERE image_hash = ?', (image_hash,))
         maybe = res.fetchone()
+
         return maybe[0] if maybe else None
 
     def get_images_by_tag(self, tag_id):
@@ -126,7 +137,10 @@ def main():
     grp.add_argument("--get", action="store_true")
     grp.add_argument("--get-all-tags", action="store_true")
 
-    parser.add_argument("--path")
+    grp2 = parser.add_mutually_exclusive_group()
+    grp2.add_argument("--path")
+    grp2.add_argument("--file")
+
     parser.add_argument("--tag")
     args = parser.parse_args()
 
@@ -155,23 +169,35 @@ def main():
             return 1
 
     if args.add:
-        if not args.tag or not args.path:
-            print('--add requires --tag and --path')
+        if not args.tag:
+            print('--add requires --tag')
             return 1
+
+        if not args.path and not args.file:
+            print('--add requires either --path or --file')
+            return 1
+
+        if args.file:
+            with open(args.file, 'r') as fh:
+                paths = fh.read().splitlines()
+
+        else:
+            paths = [args.path]
 
         db = TagDB()
 
         db.add_tag(args.tag)
         tag_id = db.get_tag(args.tag)
 
-        md5sum = getmd5sum(args.path)
+        images = []
+        for path in paths:
+            md5sum = getmd5sum(path)
+            images.append((path, md5sum))
 
-        db.add_image(args.path, md5sum)
-        image_id = db.get_image_by_hash(md5sum)
+        db.add_image_list(images)
+        db.add_image_tag_list(images, tag_id)
 
-        db.add_image_tag(image_id, tag_id)
-        print(f'Added tag "{args.tag}" to image {md5sum}:{args.path}.')
-
+        print('Done tagging.')
         return 0
 
 
